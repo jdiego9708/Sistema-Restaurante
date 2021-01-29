@@ -1,4 +1,5 @@
-﻿using CapaNegocio;
+﻿using CapaEntidades.Models;
+using CapaNegocio;
 using CapaPresentacion.Formularios.FormsEmpleados;
 using System;
 using System.Collections.Generic;
@@ -72,9 +73,9 @@ namespace CapaPresentacion.Formularios.FormsNotas
         }
 
         public event EventHandler OnRefresh;
-        EEmpleado EEmpleado;
+        Empleado EEmpleado;
 
-        public void AsignarDatos(EEmpleado eEmpleado)
+        public void AsignarDatos(Empleado eEmpleado)
         {
             this.EEmpleado = eEmpleado;
             this.txtEmpleado.Text = eEmpleado.Nombre_empleado;

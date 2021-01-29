@@ -1,4 +1,5 @@
-﻿using CapaNegocio;
+﻿using CapaEntidades.Models;
+using CapaNegocio;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -110,9 +111,9 @@ namespace CapaPresentacion.Formularios.FormsEmpleados
             }
         }
 
-        EEmpleado EEmpleado;
+        Empleado EEmpleado;
 
-        public void AsignarDatos(EEmpleado eEmpleado, bool isClaveMaestra)
+        public void AsignarDatos(Empleado eEmpleado, bool isClaveMaestra)
         {
             this.IsClaveMaestra = isClaveMaestra;
             this.EEmpleado = eEmpleado;

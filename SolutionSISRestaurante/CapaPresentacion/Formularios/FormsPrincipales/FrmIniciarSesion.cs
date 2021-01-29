@@ -1,8 +1,10 @@
-﻿using CapaNegocio;
+﻿using CapaEntidades.Models;
+using CapaNegocio;
 using System;
 using System.Configuration;
 using System.Data;
 using System.ServiceProcess;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CapaPresentacion.Formularios.FormsPrincipales
@@ -18,14 +20,13 @@ namespace CapaPresentacion.Formularios.FormsPrincipales
             this.btnIngresar.Click += BtnIngresar_Click;
         }
 
-        private void BtnIngresar_Click(object sender, EventArgs e)
+        private async Task Login()
         {
             try
             {
-                string rpta;
                 if (this.ListaEmpleados.Text != "" & this.txtPass.Texto != null)
                 {
-                    if (ListaEmpleados.Text.Equals("NINGUNO"))
+                    if (this.ListaEmpleados.Text.Equals("NINGUNO"))
                     {
                         if (this.txtPass.Texto.Equals("administrador"))
                         {
@@ -49,17 +50,24 @@ namespace CapaPresentacion.Formularios.FormsPrincipales
                     }
                     else
                     {
-                        DataTable tabla = NEmpleados.Login("LOGIN",
-                        Convert.ToString(this.ListaEmpleados.SelectedValue), this.txtPass.Texto, out rpta);
+                        var (rpta, objects) = await NEmpleados.Login("LOGIN",
+                        Convert.ToString(this.ListaEmpleados.SelectedValue), this.txtPass.Texto);
                         if (rpta.Equals("OK"))
                         {
-                            DatosInicioSesion datos = DatosInicioSesion.GetInstancia();
-                            datos.Id_empleado = Convert.ToInt32(tabla.Rows[0]["Id_empleado"]);
-                            datos.Nombre_empleado = Convert.ToString(tabla.Rows[0]["Nombre_empleado"]);
-                            datos.Cargo_empleado = Convert.ToString(tabla.Rows[0]["Cargo_empleado"]);
+                            Empleado empleado = (Empleado)objects[0];
+                            Turno turno = (Turno)objects[1];
 
-                            FrmPrincipal frmPrincipal = new FrmPrincipal();
-                            frmPrincipal.WindowState = FormWindowState.Maximized;
+                            DatosInicioSesion datos = DatosInicioSesion.GetInstancia();
+                            datos.Id_empleado = empleado.Id_empleado;
+                            datos.Nombre_empleado = empleado.Nombre_empleado;
+                            datos.Cargo_empleado = empleado.Cargo_empleado;
+                            datos.Empleado = empleado;
+                            datos.Turno = turno;
+
+                            FrmPrincipal frmPrincipal = new FrmPrincipal
+                            {
+                                WindowState = FormWindowState.Maximized
+                            };
                             frmPrincipal.Show();
 
                             this.Hide();
@@ -93,6 +101,11 @@ namespace CapaPresentacion.Formularios.FormsPrincipales
                 Mensajes.MensajeErrorCompleto(this.Name, "BtnIngresar_Click",
                     "Hubo un error al ingresar", ex.Message);
             }
+        }
+
+        private async void BtnIngresar_Click(object sender, EventArgs e)
+        {
+            await Login();
         }
 
         private void BtnCerrar_Click(object sender, EventArgs e)
@@ -164,72 +177,7 @@ namespace CapaPresentacion.Formularios.FormsPrincipales
             {
                 try
                 {
-                    string rpta;
-                    if (this.ListaEmpleados.Text != "" & this.txtPass.Texto != null)
-                    {
-                        if (ListaEmpleados.Text.Equals("NINGUNO"))
-                        {
-                            if (this.txtPass.Texto.Equals("administrador"))
-                            {
-                                DatosInicioSesion datos = DatosInicioSesion.GetInstancia();
-                                datos.Id_empleado = Convert.ToInt32(0);
-                                datos.Nombre_empleado = Convert.ToString("Administrador");
-                                datos.Cargo_empleado = "ADMINISTRADOR";
-
-                                FrmPrincipal frmPrincipal = new FrmPrincipal();
-                                frmPrincipal.WindowState = FormWindowState.Maximized;
-                                frmPrincipal.Show();
-
-                                this.Hide();
-                            }
-                            else if (this.txtPass.Texto.Equals("configadmin"))
-                            {
-                                FrmAdministracionAvanzada frm = new FrmAdministracionAvanzada();
-                                frm.StartPosition = FormStartPosition.CenterScreen;
-                                frm.ShowDialog();
-                            }
-                        }
-                        else
-                        {
-                            DataTable tabla = NEmpleados.Login("LOGIN",
-                            Convert.ToString(this.ListaEmpleados.SelectedValue), this.txtPass.Texto, out rpta);
-                            if (rpta.Equals("OK"))
-                            {
-                                DatosInicioSesion datos = DatosInicioSesion.GetInstancia();
-                                datos.Id_empleado = Convert.ToInt32(tabla.Rows[0]["Id_empleado"]);
-                                datos.Nombre_empleado = Convert.ToString(tabla.Rows[0]["Nombre_empleado"]);
-                                datos.Cargo_empleado = Convert.ToString(tabla.Rows[0]["Cargo_empleado"]);
-
-                                FrmPrincipal frmPrincipal = new FrmPrincipal();
-                                frmPrincipal.WindowState = FormWindowState.Maximized;
-                                frmPrincipal.Show();
-
-                                this.Hide();
-                            }
-                            else if (rpta.Equals(""))
-                            {
-                                Mensajes.MensajeInformacion("No se encontró el usuario, intentelo de nuevo", "Entendido");
-                            }
-                            else
-                            {
-                                throw new Exception(rpta);
-                            }
-                        }
-                    }
-                    else if (this.ListaEmpleados.Text.Equals(""))
-                    {
-                        if (this.txtPass.Texto.Equals("configadmin"))
-                        {
-                            FrmAdministracionAvanzada frm = new FrmAdministracionAvanzada();
-                            frm.StartPosition = FormStartPosition.CenterScreen;
-                            frm.ShowDialog();
-                        }
-                    }
-                    else
-                    {
-                        Mensajes.MensajeErrorForm("La contraseña es obligatoria");
-                    }
-
+                    Task.Run(() => this.Login());
                 }
                 catch (Exception ex)
                 {

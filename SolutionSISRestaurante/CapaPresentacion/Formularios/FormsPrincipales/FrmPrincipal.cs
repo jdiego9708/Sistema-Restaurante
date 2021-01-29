@@ -15,6 +15,7 @@ using System.Linq;
 using System.Windows.Forms;
 using CapaNegocio;
 using CapaPresentacion.Formularios.FormsNotas;
+using CapaEntidades.Models;
 
 namespace CapaPresentacion.Formularios.FormsPrincipales
 {
@@ -268,14 +269,14 @@ namespace CapaPresentacion.Formularios.FormsPrincipales
         {
             DataGridViewRow rowDataGrid = (DataGridViewRow)sender;
             DataRow row = ((DataRowView)rowDataGrid.DataBoundItem).Row;
-            EEmpleado eEmpleado = new EEmpleado(row);
+            Empleado Empleado = new Empleado(row);
             try
             {
                 FrmObservarNotas frm = new FrmObservarNotas
                 {
                     TopLevel = false
                 };
-                frm.AsignarDatos(eEmpleado);
+                frm.AsignarDatos(Empleado);
                 Form FormComprobado = this.ComprobarExistencia(frm);
                 if (FormComprobado != null)
                 {
@@ -351,7 +352,7 @@ namespace CapaPresentacion.Formularios.FormsPrincipales
             {
                 StartPosition = FormStartPosition.CenterScreen
             };
-            frm.AsignarDatos(new EEmpleado(row), false);
+            frm.AsignarDatos(new Empleado(row), false);
             frm.ShowDialog();
         }
 
@@ -376,7 +377,7 @@ namespace CapaPresentacion.Formularios.FormsPrincipales
             {
                 StartPosition = FormStartPosition.CenterScreen
             };
-            frm.AsignarDatos(new EEmpleado(row), true);
+            frm.AsignarDatos(new Empleado(row), true);
             frm.ShowDialog();
         }
 
@@ -399,19 +400,19 @@ namespace CapaPresentacion.Formularios.FormsPrincipales
 
             if (row != null)
             {
-                EEmpleado eEmpleado = new EEmpleado(row);
+                Empleado Empleado = new Empleado(row);
 
-                if (eEmpleado.Estado_empleado.Equals("INACTIVO"))
+                if (Empleado.Estado_empleado.Equals("INACTIVO"))
                 {
                     Mensajes.MensajeInformacion("El usuario ya está inactivo", "Entendido");
                 }
                 else
                 {
-                    Mensajes.MensajePregunta("¿Está seguro que desea inactivar el empleado " + eEmpleado.Nombre_empleado + "?",
+                    Mensajes.MensajePregunta("¿Está seguro que desea inactivar el empleado " + Empleado.Nombre_empleado + "?",
                         "Inactivar", "Cancelar", out DialogResult result);
                     if (result == DialogResult.Yes)
                     {
-                        string rpta = NEmpleados.InactivarEmpleado(eEmpleado.Id_empleado);
+                        string rpta = NEmpleados.InactivarEmpleado(Empleado.Id_empleado);
                         if (rpta.Equals("OK"))
                         {
                             Mensajes.MensajeOkForm("Se inactivó correctamente el empleado");
@@ -445,19 +446,19 @@ namespace CapaPresentacion.Formularios.FormsPrincipales
 
             if (row != null)
             {
-                EEmpleado eEmpleado = new EEmpleado(row);
+                Empleado Empleado = new Empleado(row);
 
-                if (eEmpleado.Estado_empleado.Equals("ACTIVO"))
+                if (Empleado.Estado_empleado.Equals("ACTIVO"))
                 {
                     Mensajes.MensajeInformacion("El usuario ya está activo", "Entendido");
                 }
                 else
                 {
-                    Mensajes.MensajePregunta("¿Está seguro que desea activar el empleado " + eEmpleado.Nombre_empleado + "?",
+                    Mensajes.MensajePregunta("¿Está seguro que desea activar el empleado " + Empleado.Nombre_empleado + "?",
                         "Activar", "Cancelar", out DialogResult result);
                     if (result == DialogResult.Yes)
                     {
-                        string rpta = NEmpleados.ActivarEmpleado(eEmpleado.Id_empleado);
+                        string rpta = NEmpleados.ActivarEmpleado(Empleado.Id_empleado);
                         if (rpta.Equals("OK"))
                         {
                             Mensajes.MensajeOkForm("Se activó correctamente el empleado");

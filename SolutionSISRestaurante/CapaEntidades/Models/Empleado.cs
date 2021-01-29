@@ -5,16 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CapaPresentacion.Formularios.FormsEmpleados
+namespace CapaEntidades.Models
 {
-    public class EEmpleado
+    public class Empleado
     {
-        public EEmpleado()
+        public Empleado()
         {
 
         }
 
-        public EEmpleado(DataRow row)
+        public Empleado(DataRow row)
         {
             try
             {
@@ -33,7 +33,7 @@ namespace CapaPresentacion.Formularios.FormsEmpleados
             }
         }
 
-        public EEmpleado(DataTable dt, int fila)
+        public Empleado(DataTable dt, int fila)
         {
             try
             {
@@ -72,5 +72,45 @@ namespace CapaPresentacion.Formularios.FormsEmpleados
         public string Password { get => _password; set => _password = value; }
         public int Codigo_maestro { get => _codigo_maestro; set => _codigo_maestro = value; }
         public string Estado_empleado { get => _estado_empleado; set => _estado_empleado = value; }
+
+    }
+
+    public class EmpleadoNominaBinding
+    {
+        public EmpleadoNominaBinding()
+        {
+
+        }
+
+        public EmpleadoNominaBinding(DataRow row)
+        {
+            try
+            {
+                this.Id_nomina = Convert.ToInt32(row["Id_nomina"]);
+                this.Empleado = new Empleado(row);
+                this.Turno = new Turno(row);
+                this.Propinas = Convert.ToDecimal(row["Propinas"]);
+                this.Salario = Convert.ToDecimal(row["Salario"]);
+                this.Total = Convert.ToDecimal(row["Total"]);
+            }
+            catch (Exception ex)
+            {
+                OnError?.Invoke(ex.Message, null);
+            }
+        }
+
+        public int Id_nomina { get; set; }
+
+        public Empleado Empleado { get; set; }
+
+        public Turno Turno { get; set; }
+
+        public decimal Propinas { get; set; }
+        
+        public decimal Salario { get; set; }
+
+        public decimal Total { get; set; }
+
+        public event EventHandler OnError;
     }
 }
